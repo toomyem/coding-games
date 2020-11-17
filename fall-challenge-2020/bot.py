@@ -1,16 +1,16 @@
 import sys
 import math
-
-# Auto-generated code below aims at helping you parse
-# the standard input according to the problem statement.
+import random
 
 def log(msg):
     print(msg, file=sys.stderr, flush=True)
 
 def canMake(order, inv):
+    n = 0
     for x in zip(order, inv):
         if x[0] + x[1] < 0: return False
-    return True
+        n += x[0] + x[1]
+    return n <= 10
 
 # game loop
 while True:
@@ -32,7 +32,8 @@ while True:
         item = {
             'id': action_id,
             'delta': [delta_0, delta_1, delta_2, delta_3],
-            'price': price
+            'price': price,
+            'castable': castable
         }
         if action_type == 'BREW':
             orders.append(item)
@@ -43,12 +44,27 @@ while True:
     inv = [inv_0, inv_1, inv_2, inv_3]
     opp_0, opp_1, opp_2, opp_3, opp_score = [int(j) for j in input().split()]
 
-    choices = ([o for o in orders if canMake(o['delta'], inv)])
-    choices.sort(key = lambda x: -x['price'])
     log(f"inv: {inv}")
+    choices = [o for o in orders if canMake(o['delta'], inv)]
+    choices.sort(key = lambda x: -x['price'])
+
     log(f"choices: {choices}")
-    log(f"spells: {spells}")
+
     if len(choices) > 0:
         print("BREW " + str(choices[0]['id']))
-    else:
-        print("WAIT")
+        continue
+
+    choices = [o for o in spells if canMake(o['delta'], inv) and o['castable'] > 0]
+    log(f"choices: {choices}")
+    if len(choices) > 0:
+        choice = random.choice(choices)
+        log(choice)
+        print("CAST " + str(choice['id']))
+        continue
+
+    non_castables = [o for o in spells if o['castable'] == 0]
+    if len(non_castables) > 0:
+        print("REST")
+        continue
+
+    print("WAIT")
