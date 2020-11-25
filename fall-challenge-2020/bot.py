@@ -16,6 +16,7 @@ def canMake(order, inv):
 while True:
     orders = []
     spells = []
+    tome = []
     action_count = int(input())  # the number of spells and recipes in play
     for i in range(action_count):
         action_id, action_type, delta_0, delta_1, delta_2, delta_3, price, tome_index, tax_count, castable, repeatable = input().split()
@@ -33,12 +34,17 @@ while True:
             'id': action_id,
             'delta': [delta_0, delta_1, delta_2, delta_3],
             'price': price,
-            'castable': castable
+            'castable': castable,
+            'repeatable': repeatable,
+            'tome_index': tome_index,
+            'tax_count': tax_count
         }
         if action_type == 'BREW':
             orders.append(item)
         elif action_type == 'CAST':
             spells.append(item)
+        elif action_type == 'LEARN':
+            tome.append(item)
 
     inv_0, inv_1, inv_2, inv_3, my_score = [int(j) for j in input().split()]
     inv = [inv_0, inv_1, inv_2, inv_3]
@@ -49,6 +55,11 @@ while True:
     choices.sort(key = lambda x: -x['price'])
 
     log(f"choices: {choices}")
+    log(f"tome: {tome}")
+
+    if len(spells) < 8:
+        print("LEARN " + str(tome[0]['id']))
+        continue
 
     if len(choices) > 0:
         print("BREW " + str(choices[0]['id']))
